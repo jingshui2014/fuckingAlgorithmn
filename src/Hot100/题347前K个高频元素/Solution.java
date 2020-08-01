@@ -1,60 +1,48 @@
 package Hot100.题347前K个高频元素;
 
+
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Solution {
     public int[] topKFrequent(int[] nums, int k) {
         Map<Integer, Integer> map = new HashMap<>();
-        for (int i = 0; i < nums.length; i++) {
-            map.put(nums[i], map.getOrDefault(nums[i], 0) + 1);
+        for (int num : nums) {
+            map.put(num, map.getOrDefault(num, 0) + 1);
         }
-
-
-
-        int curIndex = 0;
-        int start = 0;
-        int end = nums.length - 1;
-        while (curIndex != k) {
-            curIndex = partition(nums, start, end);
-            if(curIndex > k){
-                partition(nums,start,curIndex);
-            }else if(curIndex < k){
-
+        PriorityQueue<Integer> queue = new PriorityQueue<>(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return map.get(o1) - map.get(o2);
             }
-        }
-
-        PriorityQueue queue = new PriorityQueue();
-//        queue.add()
-
-        return null;
-
-    }
-
-    private int partition(int[] nums, int start, int end) {
-        int curTemp = nums[end];
-        int pre = start - 1;
-        for (int i = start; i <= end; i++) {
-            if (nums[i] < curTemp) {
-                pre++;
-                swap(nums, pre, i);
+        });
+        for (int num : nums) {
+            if (queue.contains(num)) {
+                continue;
             }
-        }
-        swap(nums, pre + 1, end);
-        return pre + 1;
-    }
+            if (queue.size() == k) {
+                if(map.get(num) > map.get(queue.peek())){
+                    queue.poll();
+                    queue.add(num);
+                }
+            }else {
+                queue.add(num);
+            }
 
-    private void swap(int[] nums, int a, int b) {
-        int temp = nums[a];
-        nums[a] = nums[b];
-        nums[b] = temp;
+        }
+        int[] res = new int[queue.size()];
+        int m = 0;
+        for (int temp:queue){
+            res[m++] = temp;
+        }
+        return res;
     }
 
     public static void main(String[] args) {
 
         Solution so = new Solution();
-        System.out.println(so.partition(new int[]{9, 7, 1, 2, 3}, 0, 4));
+
     }
 }
